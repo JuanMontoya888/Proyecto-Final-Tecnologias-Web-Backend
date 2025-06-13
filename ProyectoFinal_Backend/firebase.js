@@ -7,7 +7,7 @@ try {
   // Intenta cargar el archivo local
   if (fs.existsSync("./firestore-key.json")) {
     serviceAccount = require("./firestore-key.json");
-    console.log("🔑 Usando archivo local de credenciales");
+    console.log("Usando archivo local de credenciales");
   } else {
     throw new Error("Archivo firestore-key.json no encontrado");
   }

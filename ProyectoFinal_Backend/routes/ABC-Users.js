@@ -62,6 +62,29 @@ router.post('/login_email', async (req, res) => {
     }
 });
 
+router.post('/login_phoneNumber', async (req, res) => {
+    const { phoneNumber } = req.body;
+
+    try {
+        // Hacemos consulta en vez de traer todos los datos
+        const querySnapshot = await db.collection('users').where('data.phoneNumber', '==', phoneNumber).get();
+
+        if (querySnapshot.empty) {
+            return res.json({ ok: false, message: 'not-found' });
+        }
+
+        const doc = querySnapshot.docs[0];
+        const userData = doc.data().data;
+
+        console.log(userData);
+        return res.json({ ok: true, user: userData });
+
+    } catch (error) {
+        console.error('Login error:', error);
+        return res.status(500).json({ ok: false, message: 'server-error' });
+    }
+});
+
 
 router.post('/getUser', async (req, res) => {
     const { uid } = req.body;
@@ -89,7 +112,7 @@ router.post('/addUserGoogle', async (req, res) => {
         let data = req.body;
 
         console.log(data);
-        
+
         db.collection('users').add(data)
             .then((result) => {
                 res.status(200).json({ ok: true, message: 'Was created successfully' });

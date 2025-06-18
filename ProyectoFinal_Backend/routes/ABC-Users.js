@@ -221,8 +221,8 @@ router.post('/getCode', (req, res) => {
 });
 
 router.post('/unlockAccount', async (req, res) => {
-    const { email } = req.body;
-    console.log(email);
+    const { email, newPassword } = req.body;
+
     try {
         const querySnapshot = await db.collection('users').where('data.email', '==', email).get();
 
@@ -233,16 +233,16 @@ router.post('/unlockAccount', async (req, res) => {
         const doc = querySnapshot.docs[0];
         const userFound = doc.data().data;
 
-        adm_FB.auth().updateUser(userFound.UID, { disabled: false })
+        adm_FB.auth().updateUser(userFound.UID, { disabled: false, password: newPassword })
             .then(async (user) => {
-                console.log('Cuenta habilitada:', user);
+                const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
 
                 const dataSend =
-                    { 'data.attempts': 0, 'data.isAvailable': true };
+                    { 'data.attempts': 0, 'data.isAvailable': true, 'data.password': newPasswordHash };
                 console.log(dataSend);
 
                 await db.collection('users').doc(doc.id).update(dataSend);
-
+                
                 return res.json({ ok: true });
             })
             .catch((err) => {

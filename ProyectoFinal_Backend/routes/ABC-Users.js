@@ -33,7 +33,9 @@ router.post('/login_email', async (req, res) => {
             return res.json({ ok: true, user: userData });
         } else {
 
-            const dataSend = (userData.attempts + 1) <= 3 ? { 'data.attempts': admin.firestore.FieldValue.increment(1) } : { 'data.attempts': admin.firestore.FieldValue.increment(1), 'data.isAvailable': false };
+            const dataSend = (userData.attempts + 1) <= 3 ?
+                { 'data.attempts': admin.firestore.FieldValue.increment(1) } :
+                { 'data.attempts': admin.firestore.FieldValue.increment(1), 'data.isAvailable': false };
             console.log(dataSend);
 
             await db.collection('users').doc(doc.id).update(dataSend);
@@ -122,7 +124,7 @@ router.post('/addUserGoogle', async (req, res) => {
             });
     } catch (err) {
         console.error('Error al crear el usuario:', err);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({ ok: false, message: 'Error interno del servidor' });
     }
 });
 
@@ -143,6 +145,50 @@ router.post('/createUser', (req, res) => {
                 res.status(500).json({ ok: false, message: err.message });
             });
     });
+
+});
+
+router.post('/getCode', (req, res) => {
+    const { email } = req.body;
+
+    console.log(email);
+
+    res.json({ ok: true, code: 1234 });
+
+});
+
+router.post('/unlockAccount', async (req, res) => {
+    const { email } = req.body;
+    console.log(email);
+    try {
+        const querySnapshot = await db.collection('users').where('data.email', '==', email).get();
+
+        if (querySnapshot.empty) {
+            return res.json({ ok: false });
+        }
+
+        const doc = querySnapshot.docs[0];
+        const userFound = doc.data().data;
+
+        adm_FB.auth().updateUser(userFound.UID, { disabled: false })
+            .then(async (user) => {
+                console.log('Cuenta habilitada:', user);
+
+                const dataSend = 
+                    { 'data.attempts': 0, 'data.isAvailable': true };
+                console.log(dataSend);
+
+                await db.collection('users').doc(doc.id).update(dataSend);
+
+                return res.json({ ok: true });
+            })
+            .catch((err) => {
+                return res.json({ ok: false });
+            });
+    } catch (error) {
+        console.error('Error al obtener el usuario:', error);
+        return res.status(500).json({ ok: false, message: 'Error interno del servidor' });
+    }
 
 });
 

@@ -151,6 +151,54 @@ router.post('/createUser', (req, res) => {
 
 });
 
+router.post('/sendMail', (req, res) => {
+    const { email, reservacion, user } = req.body;
+
+    console.log(reservacion);
+
+    const msg = {
+        to: email,
+        subject: 'Hotel System',
+        html: `
+                <h2>Confirmación de Reservación</h2>
+                <p>Estimado/a <strong>${reservacion.nombre}</strong>,</p>
+                <p>Gracias por elegir el <strong>${reservacion.hotel}</strong>.</p>
+
+                <h3>Detalles de su reservación:</h3>
+                <ul>
+                    <li><strong>Fecha de entrada:</strong> ${new Date(reservacion.fechaInicio).toLocaleDateString()}</li>
+                    <li><strong>Fecha de salida:</strong> ${new Date(reservacion.fechaFin).toLocaleDateString()}</li>
+                    <li><strong>Tipo de habitación:</strong> ${reservacion.tipoHabitacion}</li>
+                    <li><strong>Método de pago:</strong> ${reservacion.metodoPago}</li>
+                </ul>
+
+                <h3>Servicios seleccionados:</h3>
+                <ul>
+                    ${reservacion.serviciosSeleccionados.map(serv => `<li>${serv}</li>`).join('')}
+                </ul>
+
+                <h3>Resumen de costos:</h3>
+                <ul>
+                    <li><strong>Precio base:</strong> $${reservacion.precioBase}</li>
+                    <li><strong>Precio por servicios:</strong> $${reservacion.precioServicios}</li>
+                    <li><strong>Total:</strong> $${reservacion.precioTotal}</li>
+                </ul>
+
+                <p>Esperamos que disfrute su estancia.</p>
+                <p>Atentamente,<br><strong>${reservacion.hotel}</strong></p>
+            `,
+
+    };
+
+    enviarCorreoSMTP(msg)
+        .then((resp) => {
+            res.json(resp);
+        })
+        .catch((err) => {
+            res.status(500).json(err);
+        })
+});
+
 router.post('/getCode', (req, res) => {
     const { email } = req.body;
     const code = Math.floor(Math.random() * (999999 - 111111) + 111111);
@@ -159,7 +207,7 @@ router.post('/getCode', (req, res) => {
         to: email,
         subject: 'Hotel System',
         html: `Your code is '${code}'`,
-    }
+    };
 
     enviarCorreoSMTP(msg)
         .then((resp) => {

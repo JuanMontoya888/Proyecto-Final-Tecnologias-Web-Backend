@@ -23,7 +23,7 @@ async function enviarCorreoSMTP({ to, subject, html }) {
         return { ok: true };
     } catch (error) {
         console.error('Error al enviar correo:', error);
-        return { ok: false, error };
+        return { ok: false, message: error };
     }
 }
 

@@ -5,10 +5,13 @@ const admin = require('../firebase');
 const bcrypt = require('bcrypt');
 const adm_FB = require("firebase-admin");
 
-const saltRounds = 10;
-
 //Inicializar y obtener referencia al servicio de authentication de firebase
 const db = admin.firestore();
+
+const saltRounds = 10;
+
+// Enviar correos
+const { enviarCorreoSMTP } = require('../mailer.js');
 
 router.post('/login_email', async (req, res) => {
     const { email, password } = req.body;
@@ -150,10 +153,22 @@ router.post('/createUser', (req, res) => {
 
 router.post('/getCode', (req, res) => {
     const { email } = req.body;
+    const code = Math.floor(Math.random() * (999999 - 111111) + 111111);
 
-    console.log(email);
+    const msg = {
+        to: email,
+        subject: 'Hotel System',
+        html: `Your code is '${code}'`,
+    }
 
-    res.json({ ok: true, code: 1234 });
+    enviarCorreoSMTP(msg)
+        .then((resp) => {
+            const { ok } = resp;
+            res.json({ ok, code });
+        })
+        .catch((err) => {
+            res.status(500).json(err);
+        });
 
 });
 
@@ -174,7 +189,7 @@ router.post('/unlockAccount', async (req, res) => {
             .then(async (user) => {
                 console.log('Cuenta habilitada:', user);
 
-                const dataSend = 
+                const dataSend =
                     { 'data.attempts': 0, 'data.isAvailable': true };
                 console.log(dataSend);
 

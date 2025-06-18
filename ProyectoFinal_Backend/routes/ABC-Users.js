@@ -21,7 +21,7 @@ router.post('/login_email', async (req, res) => {
         const querySnapshot = await db.collection('users').where('data.email', '==', email).get();
 
         if (querySnapshot.empty) {
-            return res.json({ ok: false, message: 'not-found' });
+            return res.json({ ok: false, message: 'not-registered' });
         }
 
         const doc = querySnapshot.docs[0];
@@ -75,7 +75,7 @@ router.post('/login_phoneNumber', async (req, res) => {
         const querySnapshot = await db.collection('users').where('data.phoneNumber', '==', phoneNumber).get();
 
         if (querySnapshot.empty) {
-            return res.json({ ok: false, message: 'not-found' });
+            return res.json({ ok: false, message: 'not-registered' });
         }
 
         const doc = querySnapshot.docs[0];
@@ -161,7 +161,7 @@ router.post('/sendMail', (req, res) => {
         subject: 'Hotel System',
         html: `
                 <h2>Confirmación de Reservación</h2>
-                <p>Estimado/a <strong>${reservacion.nombre}</strong>,</p>
+                <p>¡Hola <strong>${reservacion.nombre} !</strong>,</p>
                 <p>Gracias por elegir el <strong>${reservacion.hotel}</strong>.</p>
 
                 <h3>Detalles de su reservación:</h3>
@@ -185,7 +185,7 @@ router.post('/sendMail', (req, res) => {
                 </ul>
 
                 <p>Esperamos que disfrute su estancia.</p>
-                <p>Atentamente,<br><strong>${reservacion.hotel}</strong></p>
+                <p>Atentamente, Juan de <br><strong>${reservacion.hotel}</strong></p>
             `,
 
     };

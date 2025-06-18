@@ -92,23 +92,25 @@ router.post('/login_phoneNumber', async (req, res) => {
 
 
 router.post('/getUser', async (req, res) => {
-    const { uid } = req.body;
-
+    const { uid, email } = req.body;
+    
     try {
-        const querySnapshot = await db.collection('users').where('data.UID', '==', uid).get();
+        const querySnapshot = uid ? 
+         await db.collection('users').where('data.UID', '==', uid).get():
+         await db.collection('users').where('data.email', '==', email).get();
 
         if (querySnapshot.empty) {
-            return res.json({ user: null });
+            return res.json({ ok: false, user: null });
         }
 
         const doc = querySnapshot.docs[0];
         const userFound = doc.data().data;
 
-        return res.json({ user: userFound });
+        return res.json({ ok: true, user: userFound });
 
     } catch (error) {
         console.error('Error al obtener el usuario:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({ ok: false, error: 'Error interno del servidor' });
     }
 });
 

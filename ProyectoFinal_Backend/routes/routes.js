@@ -75,6 +75,11 @@ router.delete('/reservacion/:id', async (req, res) => {
   }
 });
 
+router.get('/getReservas', async (req, res) => {
+  const data = (await db.collection('reservas').get()).docs.map((doc) => doc.data());
+  console.log(data);
 
+  res.json({ok: true, data: data});
+});
 
 module.exports = router;

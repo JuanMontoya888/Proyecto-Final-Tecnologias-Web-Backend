@@ -6,7 +6,7 @@ const ABC_Users = require('./routes/ABC-Users')
 
 //instancia de express
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 //Codigo para poder ejecutar la api correctamente
 const cors = require('cors');
@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(morgan('dev'));
 
-app.listen(port, () => {
-    console.log(`Servidor ejecutandose en http://localhost:${port}`);
+app.listen(PORT, () => {
+    console.log(`Servidor ejecutandose en el puerto :${PORT}`);
 });
 
 app.use('/', misRutas);

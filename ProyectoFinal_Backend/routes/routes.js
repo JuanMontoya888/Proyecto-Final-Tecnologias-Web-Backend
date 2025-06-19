@@ -85,22 +85,8 @@ router.get('/getReservas', async (req, res) => {
 router.post('/getReservaBy', async (req, res) => {
   const { query } = req.body;
 
-  const campos = [
-    'createdAt', 'fechaFin', 'fechaInicio', 'hotel', 'metodoPago',
-    'nombre', 'precioBase', 'precioServicios', 'precioTotal', 'tipoHabitacion'
-  ];
-
   try {
-    const arrayData = await Promise.all(campos.map(
-      async (campo) => {
-        const snapshot = await db.collection('reservas').where(campo, '==', query).get();
-
-        return snapshot.docs.map((doc) => doc.data());
-      }));
-
-
-    // Convertimos los sub arreglos en uno solo
-    const data = arrayData.flat();
+    const data = (await db.collection('reservas').get()).docs.find(doc => doc.id === query)?.data();
 
     console.log(data);
 

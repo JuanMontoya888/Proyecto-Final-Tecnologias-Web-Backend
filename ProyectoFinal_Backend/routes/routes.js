@@ -79,7 +79,36 @@ router.get('/getReservas', async (req, res) => {
   const data = (await db.collection('reservas').get()).docs.map((doc) => doc.data());
   console.log(data);
 
-  res.json({ok: true, data: data});
+  res.json({ ok: true, data: data });
+});
+
+router.post('/getReservaBy', async (req, res) => {
+  const { query } = req.body;
+
+  const campos = [
+    'createdAt', 'fechaFin', 'fechaInicio', 'hotel', 'metodoPago',
+    'nombre', 'precioBase', 'precioServicios', 'precioTotal', 'tipoHabitacion'
+  ];
+
+  try {
+    const arrayData = await Promise.all(campos.map(
+      async (campo) => {
+        const snapshot = await db.collection('reservas').where(campo, '==', query).get();
+
+        return snapshot.docs.map((doc) => doc.data());
+      }));
+
+
+    // Convertimos los sub arreglos en uno solo
+    const data = arrayData.flat();
+
+    console.log(data);
+
+    return !data ? res.json({ ok: true, data: null }) : res.json({ ok: true, data: data });
+
+  } catch (err) {
+    return res.json({ ok: false, message: err });
+  }
 });
 
 module.exports = router;

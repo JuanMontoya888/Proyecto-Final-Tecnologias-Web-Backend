@@ -22,7 +22,7 @@ router.post('/addContacto', async (req, res) => {
 
 router.get('/getContactos', async (req, res) => {
     try {
-        const data = (await db.collection('contactos').get()).docs.map((doc) => doc.data());
+        const data = (await db.collection('contactos').get()).docs.map((doc) => { return { ...doc.data(), id: doc.id } });
 
         if (!data) {
             return res.json({ ok: false, data: null });
@@ -34,5 +34,16 @@ router.get('/getContactos', async (req, res) => {
     }
 });
 
+router.delete('/deleteContactosByID/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await db.collection('contactos').doc(id).delete();
+
+        return res.json({ ok: true, message: 'was deleted' });
+    } catch (err) {
+        return res.status(500).json({ ok: false, message: err.message });
+    }
+});
 
 module.exports = router;

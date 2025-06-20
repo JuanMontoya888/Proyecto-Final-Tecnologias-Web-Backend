@@ -22,13 +22,26 @@ router.post('/addComentario', async (req, res) => {
 
 router.get('/getComentarios', async (req, res) => {
     try {
-        const data = (await db.collection('comentarios').get()).docs.map((doc) => doc.data());
+        const data = (await db.collection('comentarios').get()).docs.map((doc) => { return { ...doc.data(), id: doc.id } });
 
         if (!data) {
             return res.json({ ok: false, data: null });
         }
 
         return res.json({ ok: true, data: data });
+    } catch (err) {
+        return res.status(500).json({ ok: false, message: err.message });
+    }
+});
+
+router.delete('/deleteComentariosByID/:id', async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        await db.collection('comentarios').doc(id).delete();
+
+        return res.json({ ok: true, message: 'was deleted' });
+
     } catch (err) {
         return res.status(500).json({ ok: false, message: err.message });
     }

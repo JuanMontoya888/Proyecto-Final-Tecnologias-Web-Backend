@@ -77,7 +77,6 @@ router.delete('/reservacion/:id', async (req, res) => {
 
 router.get('/getReservas', async (req, res) => {
   const data = (await db.collection('reservas').get()).docs.map((doc) => doc.data());
-  console.log(data);
 
   res.json({ ok: true, data: data });
 });
@@ -88,7 +87,6 @@ router.post('/getReservaBy', async (req, res) => {
   try {
     const data = (await db.collection('reservas').get()).docs.find(doc => doc.id === query)?.data();
 
-    console.log(data);
 
     return !data ? res.json({ ok: true, data: null }) : res.json({ ok: true, data: data });
 

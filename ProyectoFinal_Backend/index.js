@@ -2,6 +2,8 @@ const express = require('express');
 const morgan = require('morgan');
 const misRutas = require('./routes/routes');
 const ABC_Users = require('./routes/ABC-Users')
+const ABC_Contactos = require('./routes/ABC-Contactos.js')
+const ABC_Comentarios = require('./routes/ABC-Comentarios.js')
 
 
 //instancia de express
@@ -23,3 +25,5 @@ app.listen(PORT, () => {
 
 app.use('/', misRutas);
 app.use('/', ABC_Users);
+app.use('/', ABC_Contactos);
+app.use('/', ABC_Comentarios);

@@ -47,4 +47,18 @@ router.delete('/deleteComentariosByID/:id', async (req, res) => {
     }
 });
 
+router.post('/modifyComentariosByID', async (req, res) => {
+    const { data } = req.body;
+    const { id } = req.body;
+
+    try {
+        await db.collection('comentarios').doc(id).update(data);
+
+        return res.json({ ok: true });
+    } catch (error) {
+        console.error('Error al obtener el usuario:', error);
+        return res.status(500).json({ ok: false, message: 'Error interno del servidor' });
+    }
+});
+
 module.exports = router;
